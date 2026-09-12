@@ -4,31 +4,31 @@ Moves old Claude Code session files from `~/.claude/projects/` to `~/claude-arch
 
 ## Why
 
-Claude Code reads every `.jsonl` file in the project directory at startup. With 200+ files the startup fails:
+Claude Code reads every `.jsonl` file in the project directory at startup. Once that directory grows large enough, startup fails:
 
 ```
 error: An unknown error occurred, possibly due to low max file descriptors (Unexpected)
 ```
 
-The message is misleading: file descriptors are not the cause.
+The message is misleading: file descriptors are not the cause. This was observed at roughly 210 files totalling 335 MB in a single project; the exact threshold, and whether file count or total size is what matters, is not established.
 
 The built-in `cleanupPeriodDays` setting (default 30) deletes files by age. It does not help when you create many sessions per day, and it deletes them permanently.
 
-This script moves files older than 7 days. The data is kept.
+This script moves old files out of the way instead of deleting them. The data is kept. The age threshold is configurable and defaults to 7 days.
 
 ## What it does
 
 - Walks every project in `~/.claude/projects/`.
-- Moves `.jsonl` files older than 7 days to `~/claude-archive/<project-name>/`.
+- Moves `.jsonl` files past the age threshold to `~/claude-archive/<project-name>/`.
 - Compresses each file separately: `session.jsonl` becomes `session.jsonl.gz`.
 - Writes a log to `~/claude-archive/archiver.log`.
-- Runs every 7 days via launchd.
+- Runs on a schedule via launchd, every 7 days by default.
 
 The archive layout mirrors `~/.claude/projects/`. A directory name is the project path with `/` replaced by `-`.
 
 ## Requirements
 
-macOS. The scheduler uses launchd. The script itself is plain bash and works anywhere, but `install.sh` is macOS-only.
+macOS. `install.sh` and the scheduling both use launchd. `archive-sessions.sh` is plain bash and has only been tested on macOS; it relies on `find -mtime`, whose behavior differs between BSD and GNU, so treat other platforms as untested.
 
 ## Install
 
@@ -43,8 +43,9 @@ cd claude-tools/claude-sessions-archiver
 ```bash
 launchctl list | grep claude-archiver     # job is registered
 cat ~/claude-archive/archiver.log         # what was moved
-launchctl kickstart -k gui/$(id -u)/com.user.claude-archiver   # run now
 ```
+
+To run it now rather than waiting, see [Running it manually](#running-it-manually).
 
 ## Configuration
 
@@ -56,7 +57,7 @@ Environment variables:
 | `CLAUDE_ARCHIVE_DIR` | `~/claude-archive` | destination directory |
 | `CLAUDE_ARCHIVE_DAYS` | `7` | file age in days |
 
-Nothing sets these anywhere. The script reads them if they happen to be set and falls back to the defaults otherwise, so out of the box it archives files older than 7 days.
+Nothing sets these anywhere. The script reads them if they happen to be set and falls back to the defaults otherwise.
 
 `CLAUDE_ARCHIVE_DAYS` is the age threshold, not the schedule. It decides which files are old enough to move; `StartInterval` decides how often the script runs. The two are independent.
 
@@ -114,7 +115,7 @@ Edits to `archive-sessions.sh` take effect immediately. No reinstall needed.
 ## Reading the archive
 
 ```bash
-zcat ~/claude-archive/*/session-id.jsonl.gz
+zcat ~/claude-archive/<project>/<session-id>.jsonl.gz
 zgrep 'text' ~/claude-archive/*/*.jsonl.gz
 ```
 
