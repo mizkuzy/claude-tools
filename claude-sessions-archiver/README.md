@@ -117,9 +117,11 @@ Edits to `archive-sessions.sh` take effect immediately. No reinstall needed.
 ## Reading the archive
 
 ```bash
-zcat ~/claude-archive/<project>/<session-id>.jsonl.gz
+gunzip -c ~/claude-archive/<project>/<session-id>.jsonl.gz
 zgrep 'text' ~/claude-archive/*/*.jsonl.gz
 ```
+
+Use `gunzip -c`, not `zcat`. On macOS `zcat` appends `.Z` and fails on a `.gz` file.
 
 Python:
 
