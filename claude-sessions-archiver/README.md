@@ -100,13 +100,15 @@ Or trigger the installed launchd job:
 launchctl kickstart -k gui/$(id -u)/com.user.claude-archiver
 ```
 
-The difference: `kickstart` also resets the 7-day timer, so the next automatic run is 7 days from that moment. Running the script directly does not affect the schedule.
+Neither affects the schedule. `kickstart` adds an extra run alongside the interval; the interval keeps counting from where it was. Verified by observation: with a 30s interval, a kickstart 12s into an interval produced an extra run immediately, and the following scheduled runs still landed 30s and 60s after the previous natural firing.
 
 Both are safe to repeat. The script takes a lock against concurrent runs, and files already archived are no longer in the source directory, so a second run finds nothing to do.
 
 ## Schedule
 
-The job uses `StartInterval` (seconds), not a fixed clock time, so it does not depend on the machine being awake at a particular moment. If the interval elapses while the Mac is asleep or off, launchd runs the job once after it wakes.
+The job uses `StartInterval` (seconds), not a fixed clock time, so it does not fire at an hour the machine is likely to be off.
+
+A caveat from `man launchd.plist`: if the system is asleep when an interval would fire, that firing is missed rather than deferred. It is not run on wake. The next firing is one full interval later. A firing is also skipped if the previous run is somehow still going. In practice this means the archiver runs somewhat less often than the nominal interval, which is harmless here since it archives by file age.
 
 To change the schedule, edit `StartInterval` in `com.user.claude-archiver.plist.template` and run `./install.sh` again. 604800 is 7 days, 86400 is 1 day.
 
