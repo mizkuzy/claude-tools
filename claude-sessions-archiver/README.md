@@ -84,7 +84,7 @@ This does not affect the scheduled run. launchd starts jobs with a minimal envir
 
 ## Running it manually
 
-You do not have to wait for the schedule. Two ways:
+You can run the archiver at any time, whether or not the job is installed and regardless of when it last ran. Two ways:
 
 Run the script directly:
 
@@ -145,11 +145,3 @@ rm ~/Library/LaunchAgents/com.user.claude-archiver.plist
 ```
 
 The archive in `~/claude-archive` is not touched.
-
-## First run
-
-If Claude Code already fails to start, move everything except the most recent files once:
-
-```bash
-CLAUDE_ARCHIVE_DAYS=1 ./archive-sessions.sh
-```
