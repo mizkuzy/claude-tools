@@ -56,11 +56,28 @@ Environment variables:
 | `CLAUDE_ARCHIVE_DIR` | `~/claude-archive` | destination directory |
 | `CLAUDE_ARCHIVE_DAYS` | `7` | file age in days |
 
-Run manually with a different threshold:
+## Running it manually
+
+You do not have to wait for the schedule. Two ways:
+
+Run the script directly:
 
 ```bash
-CLAUDE_ARCHIVE_DAYS=3 ./archive-sessions.sh
+./archive-sessions.sh
+CLAUDE_ARCHIVE_DAYS=3 ./archive-sessions.sh   # different threshold
 ```
+
+Or trigger the installed launchd job:
+
+```bash
+launchctl kickstart -k gui/$(id -u)/com.user.claude-archiver
+```
+
+The difference: `kickstart` also resets the 7-day timer, so the next automatic run is 7 days from that moment. Running the script directly does not affect the schedule.
+
+Both are safe to repeat. The script takes a lock against concurrent runs, and files already archived are no longer in the source directory, so a second run finds nothing to do.
+
+## Schedule
 
 The job uses `StartInterval` (seconds), not a fixed clock time, so it does not depend on the machine being awake at a particular moment. If the interval elapses while the Mac is asleep or off, launchd runs the job once after it wakes.
 
