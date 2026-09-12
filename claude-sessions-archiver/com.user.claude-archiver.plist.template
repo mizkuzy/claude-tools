@@ -11,15 +11,10 @@
         <string>__SCRIPT__</string>
     </array>
 
-    <key>StartCalendarInterval</key>
-    <dict>
-        <key>Weekday</key>
-        <integer>0</integer>
-        <key>Hour</key>
-        <integer>3</integer>
-        <key>Minute</key>
-        <integer>0</integer>
-    </dict>
+    <!-- Every 7 days of uptime. Not tied to a clock time, so it does
+         not depend on the machine being awake at a specific moment. -->
+    <key>StartInterval</key>
+    <integer>604800</integer>
 
     <key>StandardOutPath</key>
     <string>__ARCHIVE__/launchd.out.log</string>

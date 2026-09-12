@@ -22,7 +22,7 @@ This script moves files older than 7 days. The data is kept.
 - Moves `.jsonl` files older than 7 days to `~/claude-archive/<project-name>/`.
 - Compresses each file separately: `session.jsonl` becomes `session.jsonl.gz`.
 - Writes a log to `~/claude-archive/archiver.log`.
-- Runs on Sundays at 03:00 via launchd.
+- Runs every 7 days via launchd.
 
 The archive layout mirrors `~/.claude/projects/`. A directory name is the project path with `/` replaced by `-`.
 
@@ -62,7 +62,9 @@ Run manually with a different threshold:
 CLAUDE_ARCHIVE_DAYS=3 ./archive-sessions.sh
 ```
 
-To change the schedule, edit `com.user.claude-archiver.plist.template` and run `./install.sh` again. `Weekday`: 0 is Sunday, 1 is Monday.
+The job uses `StartInterval` (seconds), not a fixed clock time, so it does not depend on the machine being awake at a particular moment. If the interval elapses while the Mac is asleep or off, launchd runs the job once after it wakes.
+
+To change the schedule, edit `StartInterval` in `com.user.claude-archiver.plist.template` and run `./install.sh` again. 604800 is 7 days, 86400 is 1 day.
 
 Edits to `archive-sessions.sh` take effect immediately. No reinstall needed.
 
