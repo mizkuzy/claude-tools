@@ -56,6 +56,32 @@ Environment variables:
 | `CLAUDE_ARCHIVE_DIR` | `~/claude-archive` | destination directory |
 | `CLAUDE_ARCHIVE_DAYS` | `7` | file age in days |
 
+Nothing sets these anywhere. The script reads them if they happen to be set and falls back to the defaults otherwise, so out of the box it archives files older than 7 days.
+
+`CLAUDE_ARCHIVE_DAYS` is the age threshold, not the schedule. It decides which files are old enough to move; `StartInterval` decides how often the script runs. The two are independent.
+
+To override for a single run:
+
+```bash
+CLAUDE_ARCHIVE_DAYS=3 ./archive-sessions.sh
+```
+
+You can also export one in `~/.zshrc` to change the default for runs you start from a terminal:
+
+```bash
+export CLAUDE_ARCHIVE_DAYS=14
+```
+
+This does not affect the scheduled run. launchd starts jobs with a minimal environment and does not read your shell profile. To change the threshold for scheduled runs, add an `EnvironmentVariables` block to `com.user.claude-archiver.plist.template` and reinstall:
+
+```xml
+<key>EnvironmentVariables</key>
+<dict>
+    <key>CLAUDE_ARCHIVE_DAYS</key>
+    <string>14</string>
+</dict>
+```
+
 ## Running it manually
 
 You do not have to wait for the schedule. Two ways:
