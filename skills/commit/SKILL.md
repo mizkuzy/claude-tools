@@ -29,6 +29,7 @@ BF-338: alert Slack when a Deploy run fails
 - Use a short prefix for readability in `git log --oneline` (BF-261, VP-142)
 
 **Body:**
+- If changes are small and the title is enough, do not add a body
 - Explain what the change does and why
 - Use proper grammar and punctuation
 - Use imperative mood throughout
