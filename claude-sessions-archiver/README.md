@@ -3,6 +3,9 @@
 Moves old Claude Code session files from `~/.claude/projects/` to `~/claude-archive/` and compresses them.
 
 ## Why
+The reason is wrong. archiving of files hasn't fixed the problem. Restarting fix.
+But maybe this script worth it to have sessions in one place for future analysis. 
+
 
 Claude Code reads every `.jsonl` file in the project directory at startup. Once that directory grows large enough, startup fails:
 
