@@ -27,6 +27,7 @@ BF-338: alert Slack when a Deploy run fails
 - Use lowercase except for symbols or acronyms
 - Use imperative mood ("add feature" not "adds feature", "fix impersonation banner overlapping")
 - Use a short prefix for readability in `git log --oneline` (BF-261, VP-142)
+- Skip the prefix if there is no task number
 
 **Body:**
 - If changes are small and the title is enough, do not add a body
